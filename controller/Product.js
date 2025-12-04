@@ -1,10 +1,27 @@
-import { Sequelize, where } from 'sequelize'
+import { Sequelize } from 'sequelize'
 /** @type {import('sequelize').ModelStatic<import('sequelize').Model>} */
 import { ProductModel } from '../database/products.js'
 import { CartModel } from '../database/cart.js'
 import { CategoryModel } from '../database/categories.js'
 import { GenderModel } from '../database/gender.js'
+import { UserModel } from '../database/user.js'
 import { Op } from 'sequelize'
+
+export async function GetSPP (req, res) {
+  try {
+    const productID = Number(req.query.ID)
+    console.log(productID)
+    const item = await ProductModel.findByPk(productID)
+    if (item) {
+      // console.log(item)
+      const product = item.toJSON()
+      console.log(product)
+      return res.status(200).json({ product: product })
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 export async function GetAllProducts (req, res) {
   try {
@@ -12,8 +29,6 @@ export async function GetAllProducts (req, res) {
     const category = Number(req.query.category)
     const gender = Number(req.query.gender)
     const color = req.query.color.toLowerCase()
-
-    // console.log(color)
 
     const limit = 12
     const skip = (page - 1) * limit

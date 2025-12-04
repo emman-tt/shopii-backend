@@ -13,7 +13,7 @@ export const cartProduct = sequelize.define('cartProduct', {
     allowNull: false
   },
   size: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: false
   },
   quantity:{

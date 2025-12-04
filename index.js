@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
 dotenv.config()
 import express from 'express'
- import { sequelize } from './config/sqlConfig.js'
+import { sequelize } from './config/sqlConfig.js'
 const app = express()
 const PORT = 3000
 import cors from 'cors'
@@ -13,17 +13,14 @@ import { CartModel } from './database/cart.js'
 import { cartProduct } from './database/cartProducts.js'
 import { UserModel } from './database/user.js'
 /** @type {import('sequelize').ModelStatic<import('sequelize').Model>} */
-// app.use(
-//   cors({
-//     origin: ['http://localhost:5173/shopii'],
-//     methods: ['GET', 'POST']
-//   })
-// )
 
+app.use(
+  cors({
+    origin: ['http://localhost:5173', 'https://emman-tt.github.io/shopii/'],
+    methods: ['GET', 'POST', 'PUT']
+  })
+)
 
-
-
- app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
@@ -71,7 +68,9 @@ ProductModel.belongsTo(GenderModel, {
 })
 ;(async function setupDB () {
   try {
-    //  await sequelize.sync()
+ 
+    //   await sequelize.sync({alter:true})
+    await sequelize.sync()
   } catch (error) {
     console.log(error.message)
   }
