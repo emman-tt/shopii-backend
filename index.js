@@ -16,7 +16,11 @@ import { UserModel } from './database/user.js'
 
 app.use(
   cors({
-    origin: ['http://localhost:5173', 'https://emman-tt.github.io/shopii/'],
+    origin: [
+      'http://localhost:5173',
+      'https://emman-tt.github.io/shopii/',
+      'https://shopii-web.vercel.app/'
+    ],
     methods: ['GET', 'POST', 'PUT']
   })
 )
@@ -68,7 +72,6 @@ ProductModel.belongsTo(GenderModel, {
 })
 ;(async function setupDB () {
   try {
- 
     //   await sequelize.sync({alter:true})
     await sequelize.sync()
   } catch (error) {

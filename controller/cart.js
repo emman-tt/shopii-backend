@@ -4,7 +4,6 @@ import { ProductModel } from '../database/products.js'
 import { UserModel } from '../database/user.js'
 import { CartModel } from '../database/cart.js'
 import { cartProduct } from '../database/cartProducts.js'
-import { json } from 'express'
 
 export async function SaveToCart (req, res) {
   try {
@@ -33,7 +32,6 @@ export async function SaveToCart (req, res) {
     res.status(200).json({
       total: count || 0
     })
-
   } catch (error) {
     res.status(500).json({
       err: error.message
@@ -41,7 +39,7 @@ export async function SaveToCart (req, res) {
   }
 }
 
-export async function readTotal (req,res) {
+export async function readTotal (req, res) {
   try {
     const count = await cartProduct.sum('quantity', {
       where: { cartId: 1 }
@@ -49,11 +47,37 @@ export async function readTotal (req,res) {
 
     console.log(count)
 
-  return  res.status(200).json({
+    return res.status(200).json({
       total: count || 0
     })
   } catch (error) {
-return    res.status(500).json({
+    return res.status(500).json({
+      err: error.message
+    })
+  }
+}
+
+export async function fetchCart (req, res) {
+  try {
+    const currentUser = await UserModel.findByPk(1)
+    const cart = await currentUser.getCart()
+    if (!cart) {
+      await currentUser.createCart()
+    }
+    const items = await cart.getProducts({
+      through: { attributes: ['color', 'size', 'quantity'] }
+    })
+
+    if (items) {
+    const products=  items.map(item => item.dataValues)
+      return res.status(200).json({
+        products: products
+      })
+    }
+
+  } catch (error) {
+    console.log(error.message)
+    return res.status(500).json({
       err: error.message
     })
   }
