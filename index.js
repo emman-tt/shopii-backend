@@ -73,7 +73,7 @@ ProductModel.belongsTo(GenderModel, {
 ;(async function setupDB () {
   try {
     //   await sequelize.sync({alter:true})
-    await sequelize.sync()
+    // await sequelize.sync()
   } catch (error) {
     console.log(error.message)
   }
