@@ -21,7 +21,7 @@ app.use(
       'https://emman-tt.github.io/shopii/',
       'https://shopii-web.vercel.app/'
     ],
-    methods: ['GET', 'POST', 'PUT','DELETE']
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
   })
 )
 
