@@ -19,7 +19,7 @@ app.use(
     origin: [
       'http://localhost:5173',
       'https://emman-tt.github.io/shopii/',
-      'https://shopii-web.vercel.app/'
+      'https://shopii-web.vercel.app'
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE']
   })
