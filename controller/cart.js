@@ -25,6 +25,7 @@ export async function UpdateCart (req, res) {
       const oldQuantity = product.cartProduct.quantity
       const newQuantity = oldQuantity + quantity
 
+      
       await product.cartProduct.update({ quantity: newQuantity })
 
       console.log('old :', oldQuantity)
@@ -128,7 +129,7 @@ export async function fetchCart (req, res) {
       await currentUser.createCart()
     }
     const items = await cart.getProducts({
-      through: { attributes: ['color', 'size', 'quantity'] }
+      through: { attributes: ['colour', 'size', 'quantity'] }
     })
 
     if (items) {

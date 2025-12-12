@@ -48,11 +48,11 @@ UserModel.hasOne(CartModel)
 CartModel.belongsTo(UserModel)
 
 CartModel.belongsToMany(ProductModel, {
-  through: 'cartProduct'
+  through: cartProduct
 })
 
 ProductModel.belongsToMany(CartModel, {
-  through: 'cartProduct'
+  through: cartProduct
 })
 
 CategoryModel.hasMany(ProductModel, {
