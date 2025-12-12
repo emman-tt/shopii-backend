@@ -22,8 +22,7 @@ export const cartProduct = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false
     }
-  },
-  {
-    tableName: 'cartProduct'
+  },{
+    tableName:'cartProduct'
   }
 )
