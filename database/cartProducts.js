@@ -24,6 +24,8 @@ export const cartProduct = sequelize.define(
     }
   },
   {
-    freezeTableName: true
+    tableName:"cartproduct",
+    freezeTableName: true,
+    underscored:false
   }
 )

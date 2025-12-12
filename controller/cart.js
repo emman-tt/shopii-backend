@@ -73,7 +73,7 @@ export async function SaveToCart (req, res) {
   try {
     const currentUser = await UserModel.findByPk(1)
     const { itemID, color, size, quantity } = req.query
-    console.log(color, size, quantity)
+    // console.log(color, size, quantity)
 
     const cart = await currentUser.getCart()
     if (!cart) {

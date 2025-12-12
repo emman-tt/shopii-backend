@@ -48,11 +48,13 @@ UserModel.hasOne(CartModel)
 CartModel.belongsTo(UserModel)
 
 CartModel.belongsToMany(ProductModel, {
-  through: cartProduct
+  through: cartProduct,
+  foreignKey: 'cartId'
 })
 
 ProductModel.belongsToMany(CartModel, {
-  through: cartProduct
+  through: cartProduct,
+  foreignKey: 'productId'
 })
 
 CategoryModel.hasMany(ProductModel, {
@@ -73,7 +75,7 @@ ProductModel.belongsTo(GenderModel, {
 ;(async function setupDB () {
   try {
     // await sequelize.sync({alter:true})
-    //  await sequelize.sync() 
+      //  await sequelize.sync()
   } catch (error) {
     console.log(error.message)
   }
