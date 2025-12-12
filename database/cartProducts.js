@@ -22,7 +22,8 @@ export const cartProduct = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false
     }
-  },{
-    tableName:'cartProduct'
+  },
+  {
+    freezeTableName: true
   }
 )
