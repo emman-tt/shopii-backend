@@ -25,7 +25,6 @@ export async function UpdateCart (req, res) {
       const oldQuantity = product.cartProduct.quantity
       const newQuantity = oldQuantity + quantity
 
-      
       await product.cartProduct.update({ quantity: newQuantity })
 
       console.log('old :', oldQuantity)
@@ -108,8 +107,6 @@ export async function readTotal (req, res) {
     const count = await cartProduct.sum('quantity', {
       where: { cartId: 1 }
     })
-
-    console.log(count)
 
     return res.status(200).json({
       total: count || 0

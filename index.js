@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
 dotenv.config()
 import express from 'express'
-import { sequelize } from './config/sqlConfig.js'
+// import { sequelize } from './config/sqlConfig.js'
 const app = express()
 const PORT = 3000
 import cors from 'cors'
