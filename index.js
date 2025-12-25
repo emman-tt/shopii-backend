@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
 dotenv.config()
 import express from 'express'
-// import { sequelize } from './config/sqlConfig.js'
+import { sequelize } from './config/sqlConfig.js'
 const app = express()
 const PORT = 3000
 import cors from 'cors'
@@ -75,9 +75,9 @@ ProductModel.belongsTo(GenderModel, {
 ;(async function setupDB () {
   try {
     // await sequelize.sync({alter:true})
-      //  await sequelize.sync()
+    // await sequelize.sync()
   } catch (error) {
-    console.log(error.message)
+    console.log('databse error', error.message)
   }
 })()
 

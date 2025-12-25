@@ -27,8 +27,7 @@ export async function UpdateCart (req, res) {
 
       await product.cartProduct.update({ quantity: newQuantity })
 
-      console.log('old :', oldQuantity)
-      console.log('new :', newQuantity)
+
 
       return res.status(200).json({
         id: prodID,
@@ -108,6 +107,7 @@ export async function readTotal (req, res) {
       where: { cartId: 1 }
     })
 
+    // console.log(count)
     return res.status(200).json({
       total: count || 0
     })
@@ -131,6 +131,7 @@ export async function fetchCart (req, res) {
 
     if (items) {
       const products = items.map(item => item.dataValues)
+      
       return res.status(200).json({
         products: products
       })

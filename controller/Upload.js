@@ -2,45 +2,61 @@ import { ProductModel } from '../database/products.js'
 
 export async function Uploader (req, res) {
   try {
+    console.log('Request received')
+    console.log(req.body)
+
+    // 1. Check for file
     if (!req.file) {
       return res.status(400).json({ error: 'No image added' })
     }
 
-    const { name, price, description, catID, GenId, highlights } = req.body
-    console.log(name, price, description)
-    // console.log('Uploaded file:', JSON.stringify(req.file, null, 2))
+    const { name, price, description, catID, GenID, highlights, colours } =
+      req.body
+
+    // 2. Validate fields (Fixes the hanging issue)
+    if (
+      !name ||
+      !price ||
+      !description ||
+      !catID ||
+      !GenID ||
+      !highlights ||
+      !colours
+    ) {
+      console.log('Validation failed: Missing fields')
+      return res.status(400).json({ error: 'Missing required fields' })
+    }
+
     const imageUrl = req.file.path
-
     const parsedHighlights = JSON.parse(highlights)
-    ;(async function saveProduct () {
-      try {
-     const product =   await ProductModel.create({
-          name: name,
-          price: price,
-          description: description,
-          image: imageUrl,
-          categoryId: catID,
-          genderId: GenId,
-          highlights: parsedHighlights
-        })
+    const parsedColours = JSON.parse(colours)
+    // console.log(parsedColours)
 
-        if (product) {
-          console.log(product.toJSON())
-        }
-      } catch (error) {
-        console.log(error.message)
-      }
-    })()
+    // 3. Save to DB (Wait for this to finish before responding)
+    const product = await ProductModel.create({
+      name: name,
+      price: price,
+      description: description,
+      image: imageUrl,
+      categoryId: catID,
+      genderId: GenID,
+      highlights: parsedHighlights,
+      colours: parsedColours
+    })
 
-    res.json({
+    // 4. Send the success response AFTER the save is successful
+    return res.status(201).json({
       success: true,
       message: 'Saved successfully',
-      url: imageUrl
+      url: imageUrl,
+      product: product
     })
   } catch (error) {
-    console.error(error)
-    res.status(500).json({ message: 'Upload failed', error: error.message })
+    console.error('Upload Error:', error)
+    // Ensure we send a response on error so it doesn't spin
+    return res.status(500).json({
+      message: 'Upload failed',
+      error: error.message
+    })
   }
 }
-
-

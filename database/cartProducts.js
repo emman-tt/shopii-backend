@@ -11,11 +11,11 @@ export const cartProduct = sequelize.define(
       primaryKey: true
     },
     colour: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(255),
       allowNull: false
     },
     size: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(255),
       allowNull: false
     },
     quantity: {
@@ -26,6 +26,6 @@ export const cartProduct = sequelize.define(
   {
     tableName:"cartproduct",
     freezeTableName: true,
-    underscored:false
+   
   }
 )

@@ -10,16 +10,16 @@ import { Op } from 'sequelize'
 export async function GetSPP (req, res) {
   try {
     const productID = Number(req.query.ID)
-    // console.log(productID)
+    console.log(productID)
     const item = await ProductModel.findByPk(productID)
     if (item) {
-      // console.log(item)
       const product = item.toJSON()
       // console.log(product)
       return res.status(200).json({ product: product })
     }
   } catch (error) {
-    console.log(error)
+    console.log(error.message)
+    return res.status(500).json({ error: error.message })
   }
 }
 
@@ -59,16 +59,9 @@ export async function GetAllProducts (req, res) {
         // limit: limit,
         // offset: skip,
         where: {
-          [Op.and]: [
-            Sequelize.where(
-              Sequelize.fn(
-                'JSON_CONTAINS',
-                Sequelize.col('colours'),
-                JSON.stringify([color])
-              ),
-              true
-            )
-          ]
+          colours: {
+            [Op.contains]: [color]
+          }
         }
       })
       if (data) {
@@ -84,14 +77,11 @@ export async function GetAllProducts (req, res) {
         genderId: gender,
         categoryId: category - 1,
         [Op.and]: [
-          Sequelize.where(
-            Sequelize.fn(
-              'JSON_CONTAINS',
-              Sequelize.col('colours'),
-              JSON.stringify([color])
-            ),
-            true
-          )
+          {
+            colours: {
+              [Op.contains]: [color]
+            }
+          }
         ]
       }
     })
@@ -99,6 +89,7 @@ export async function GetAllProducts (req, res) {
     const products = categoryProducts.map(item => item.dataValues)
     res.status(200).json({ products: products })
   } catch (error) {
+    console.log(error.message)
     res.status(500).json({ error: error.message })
   }
 }

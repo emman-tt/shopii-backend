@@ -5,33 +5,33 @@ import { sequelize } from '../config/sqlConfig.js'
 
 export const ProductModel = sequelize.define('product', {
   id: {
-    type: Sequelize.INTEGER,
+    type: DataTypes.INTEGER,
     primaryKey: true,
     allowNull: false,
     autoIncrement: true
   },
   name: {
     allowNull: false,
-    type: Sequelize.STRING
+    type: DataTypes.STRING(255)
   },
   price: {
-    type: Sequelize.DOUBLE,
+    type: DataTypes.DOUBLE,
     allowNull: false
   },
   description: {
-    type: Sequelize.STRING,
+    type: DataTypes.STRING(255),
     allowNull: false
   },
   image: {
-    type: Sequelize.STRING,
+    type: DataTypes.STRING(255),
     allowNull: false
   },
   highlights: {
-    type:  DataTypes.JSON,
+    type:  DataTypes.JSONB,
     allowNull: false
   },
   colours:{
-    type: DataTypes.JSON,
+    type: DataTypes.JSONB,
     allowNull:false
   }
 })
