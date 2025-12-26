@@ -14,6 +14,7 @@ import { cartProduct } from './database/cartProducts.js'
 import { UserModel } from './database/user.js'
 /** @type {import('sequelize').ModelStatic<import('sequelize').Model>} */
 
+app.use(cors())
 app.use(
   cors({
     origin: [
@@ -75,7 +76,7 @@ ProductModel.belongsTo(GenderModel, {
 ;(async function setupDB () {
   try {
     // await sequelize.sync({alter:true})
-    // await sequelize.sync()
+    await sequelize.sync()
   } catch (error) {
     console.log('databse error', error.message)
   }

@@ -27,8 +27,6 @@ export async function UpdateCart (req, res) {
 
       await product.cartProduct.update({ quantity: newQuantity })
 
-
-
       return res.status(200).json({
         id: prodID,
         quantity: newQuantity
@@ -71,7 +69,7 @@ export async function SaveToCart (req, res) {
   try {
     const currentUser = await UserModel.findByPk(1)
     const { itemID, color, size, quantity } = req.query
-    // console.log(color, size, quantity)
+    
 
     const cart = await currentUser.getCart()
     if (!cart) {
@@ -107,7 +105,6 @@ export async function readTotal (req, res) {
       where: { cartId: 1 }
     })
 
-    // console.log(count)
     return res.status(200).json({
       total: count || 0
     })
@@ -131,7 +128,7 @@ export async function fetchCart (req, res) {
 
     if (items) {
       const products = items.map(item => item.dataValues)
-      
+
       return res.status(200).json({
         products: products
       })
