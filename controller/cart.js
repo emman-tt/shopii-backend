@@ -38,7 +38,7 @@ export async function UpdateCart (req, res) {
       })
     }
   } catch (error) {
-    console.log(error.message)
+    console.log('update cart error', error.message)
     res.status(500).json({
       err: error.message
     })
@@ -68,7 +68,7 @@ export async function DeleteFromCart (req, res) {
       msg: 'Deleted succesfully'
     })
   } catch (error) {
-    console.log(error.message)
+    console.log('delete from cart error', error.message)
     res.status(500).json({
       err: error.message
     })
@@ -106,7 +106,7 @@ export async function SaveToCart (req, res) {
       total: count || 0
     })
   } catch (error) {
-    console.log(error.message)
+    console.log('save to cart error', error.message)
     res.status(500).json({
       err: error.message
     })
@@ -120,7 +120,6 @@ export async function readTotal (req, res) {
     let cart = await CartModel.findOne({
       where: userId ? { userId } : { sessionId }
     })
-    const guestCartId = cart.dataValues.id
 
     if (!cart) {
       return res.status(200).json({
@@ -128,6 +127,7 @@ export async function readTotal (req, res) {
       })
     }
 
+    const guestCartId = cart.dataValues.id
     const count = await cartProduct.sum('quantity', {
       where: { cartId: guestCartId }
     })
@@ -136,7 +136,7 @@ export async function readTotal (req, res) {
       total: count || 0
     })
   } catch (error) {
-    console.log(error.message)
+    console.log('read total error', error.message)
     return res.status(500).json({
       err: error.message
     })
@@ -150,9 +150,13 @@ export async function fetchCart (req, res) {
     let cart = await CartModel.findOne({
       where: userId ? { userId } : { sessionId }
     })
+    console.log(sessionId)
 
     if (!cart) {
       await CartModel.create({ userId, sessionId })
+      return res.status(200).json({
+        products: []
+      })
     }
     const items = await cart.getProducts({
       through: { attributes: ['colour', 'size', 'quantity'] }
@@ -166,7 +170,7 @@ export async function fetchCart (req, res) {
       })
     }
   } catch (error) {
-    console.log(error.message)
+    console.log('fetch error', error.message)
     return res.status(500).json({
       err: error.message
     })
