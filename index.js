@@ -14,7 +14,6 @@ import { cartProduct } from './database/cartProducts.js'
 import { UserModel } from './database/user.js'
 /** @type {import('sequelize').ModelStatic<import('sequelize').Model>} */
 
-app.use(cors())
 app.use(
   cors({
     origin: [

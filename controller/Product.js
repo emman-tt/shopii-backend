@@ -10,11 +10,10 @@ import { Op } from 'sequelize'
 export async function GetSPP (req, res) {
   try {
     const productID = Number(req.query.ID)
-    console.log(productID)
+    // console.log(productID)
     const item = await ProductModel.findByPk(productID)
     if (item) {
       const product = item.toJSON()
-      // console.log(product)
       return res.status(200).json({ product: product })
     }
   } catch (error) {
