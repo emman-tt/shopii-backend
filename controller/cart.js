@@ -12,8 +12,13 @@ export async function UpdateCart (req, res) {
     const prodID = Number(productID)
     const quantity = Number(qty)
 
-    const currentUser = await UserModel.findByPk(1)
-    const cart = await currentUser.getCart()
+    const userId = req.session.userId || null
+    const sessionId = !userId ? req.sessionID : null
+
+    const cart = await CartModel.findOne({
+      where: userId ? { userId } : { sessionId }
+    })
+
     const item = await cart.getProducts({
       where: {
         id: productID
@@ -43,10 +48,14 @@ export async function UpdateCart (req, res) {
 export async function DeleteFromCart (req, res) {
   try {
     const { productID } = req.query
-    const user = await UserModel.findByPk(1)
-    const cart = await user.getCart()
+    const userId = req.session.userId || null
+    const sessionId = !userId ? req.sessionID : null
 
-    if (cart && user) {
+    const cart = await CartModel.findOne({
+      where: userId ? { userId } : { sessionId }
+    })
+
+    if (cart) {
       await cartProduct.destroy({
         where: {
           cartId: cart.id,
@@ -59,6 +68,7 @@ export async function DeleteFromCart (req, res) {
       msg: 'Deleted succesfully'
     })
   } catch (error) {
+    console.log(error.message)
     res.status(500).json({
       err: error.message
     })
@@ -67,15 +77,18 @@ export async function DeleteFromCart (req, res) {
 
 export async function SaveToCart (req, res) {
   try {
-    const currentUser = await UserModel.findByPk(1)
-    const { itemID, color, size, quantity } = req.query
-    
+    const { itemID, quantity, color, size } = req.query
+    const userId = req.session.userId || null
+    const sessionId = !userId ? req.sessionID : null
+    // console.log(sessionId)
 
-    const cart = await currentUser.getCart()
+    let cart = await CartModel.findOne({
+      where: userId ? { userId } : { sessionId }
+    })
+
     if (!cart) {
-      await currentUser.createCart()
+      cart = await CartModel.create({ userId, sessionId })
     }
-
     const item = await ProductModel.findByPk(itemID)
 
     const products = await cart.addProduct(item, {
@@ -93,6 +106,7 @@ export async function SaveToCart (req, res) {
       total: count || 0
     })
   } catch (error) {
+    console.log(error.message)
     res.status(500).json({
       err: error.message
     })
@@ -101,14 +115,28 @@ export async function SaveToCart (req, res) {
 
 export async function readTotal (req, res) {
   try {
+    const userId = req.session.userId || null
+    const sessionId = !userId ? req.sessionID : null
+    let cart = await CartModel.findOne({
+      where: userId ? { userId } : { sessionId }
+    })
+    const guestCartId = cart.dataValues.id
+
+    if (!cart) {
+      return res.status(200).json({
+        total: 0
+      })
+    }
+
     const count = await cartProduct.sum('quantity', {
-      where: { cartId: 1 }
+      where: { cartId: guestCartId }
     })
 
     return res.status(200).json({
       total: count || 0
     })
   } catch (error) {
+    console.log(error.message)
     return res.status(500).json({
       err: error.message
     })
@@ -117,10 +145,14 @@ export async function readTotal (req, res) {
 
 export async function fetchCart (req, res) {
   try {
-    const currentUser = await UserModel.findByPk(1)
-    const cart = await currentUser.getCart()
+    const userId = req.session.userId || null
+    const sessionId = !userId ? req.sessionID : null
+    let cart = await CartModel.findOne({
+      where: userId ? { userId } : { sessionId }
+    })
+
     if (!cart) {
-      await currentUser.createCart()
+      await CartModel.create({ userId, sessionId })
     }
     const items = await cart.getProducts({
       through: { attributes: ['colour', 'size', 'quantity'] }

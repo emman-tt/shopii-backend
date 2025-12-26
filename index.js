@@ -12,6 +12,33 @@ import { GenderModel } from './database/gender.js'
 import { CartModel } from './database/cart.js'
 import { cartProduct } from './database/cartProducts.js'
 import { UserModel } from './database/user.js'
+import session from 'express-session'
+import connectSessionSequelize from 'connect-session-sequelize'
+const SequelizeStore = connectSessionSequelize(session.Store)
+
+const sessionStore = new SequelizeStore({
+  db: sequelize,
+  checkExpirationInterval: 1000 * 60,
+  expiration: 1000 * 60 * 60 * 12 * 3
+})
+
+app.use(
+  session({
+    secret: 'my_first _session_cofig_sec_keyboard_cat', // Move this to process.env.SESSION_SECRET
+    store: sessionStore,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      path: '/',
+      maxAge: 3 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+      secure: false
+    }
+  })
+)
+
+sessionStore.sync()
+
 /** @type {import('sequelize').ModelStatic<import('sequelize').Model>} */
 
 app.use(
@@ -21,6 +48,7 @@ app.use(
       'https://emman-tt.github.io/shopii/',
       'https://shopii-web.vercel.app'
     ],
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE']
   })
 )
@@ -28,6 +56,10 @@ app.use(
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+app.use('/', (req, res, next) => {
+  req.session.visited = true
+  next()
+})
 app.use('/api', routes)
 
 app.get('/', (req, res) => {
