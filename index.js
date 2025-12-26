@@ -24,11 +24,13 @@ const sessionStore = new SequelizeStore({
 
 app.use(
   session({
-    secret: 'my_first _session_cofig_sec_keyboard_cat', // Move this to process.env.SESSION_SECRET
+    secret: process.env.SESSION_SECRET , 
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
+    proxy: true,
     cookie: {
+      sameSite: 'none',
       path: '/',
       maxAge: 3 * 24 * 60 * 60 * 1000,
       httpOnly: true,
