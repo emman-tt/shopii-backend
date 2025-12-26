@@ -12,8 +12,15 @@ export async function UpdateCart (req, res) {
     const prodID = Number(productID)
     const quantity = Number(qty)
 
+    if (prodID === 0) {
+      return res.status(200).json({
+        msg: 'declined'
+      })
+    }
+
     const userId = req.session.userId || null
     const sessionId = !userId ? req.sessionID : null
+    console.log('update session id', sessionId)
 
     const cart = await CartModel.findOne({
       where: userId ? { userId } : { sessionId }
@@ -50,6 +57,7 @@ export async function DeleteFromCart (req, res) {
     const { productID } = req.query
     const userId = req.session.userId || null
     const sessionId = !userId ? req.sessionID : null
+    console.log('delete cart session id', sessionId)
 
     const cart = await CartModel.findOne({
       where: userId ? { userId } : { sessionId }
@@ -81,6 +89,7 @@ export async function SaveToCart (req, res) {
     const userId = req.session.userId || null
     const sessionId = !userId ? req.sessionID : null
     // console.log(sessionId)
+    console.log('save cart session id', sessionId)
 
     let cart = await CartModel.findOne({
       where: userId ? { userId } : { sessionId }
@@ -117,6 +126,7 @@ export async function readTotal (req, res) {
   try {
     const userId = req.session.userId || null
     const sessionId = !userId ? req.sessionID : null
+    console.log('total session id', sessionId)
     let cart = await CartModel.findOne({
       where: userId ? { userId } : { sessionId }
     })
@@ -150,7 +160,7 @@ export async function fetchCart (req, res) {
     let cart = await CartModel.findOne({
       where: userId ? { userId } : { sessionId }
     })
-    console.log(sessionId)
+    console.log('fetch cart session id', sessionId)
 
     if (!cart) {
       await CartModel.create({ userId, sessionId })
