@@ -97,84 +97,31 @@ export async function DeleteFromCart (req, res) {
 export async function SaveToCart (req, res) {
   try {
     const { itemID, quantity, color, size } = req.query
-    const userId = req.cookies.userToken || null
-    let anonymousToken = req.cookies.anonymousToken || null
-    let decoded
-    if (!userId) {
-      if (!anonymousToken) {
-        const { accessToken, refreshToken } = generateAnonymousTokens()
 
-        res.cookie('anonymousToken', accessToken, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'none',
-          maxAge: 1000 * 60 * 25
-        })
+    const decodedId = req.user.anonymousID
 
-        res.cookie('refreshToken', refreshToken, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'none',
-          maxAge: 7 * 24 * 60 * 60 * 1000
-        })
-        res.header('Access-Control-Allow-Credentials', 'true')
-
-        decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET)
-        const decodedId = decoded.anonymousID
-        console.log(decodedId)
-
-        let cart = await CartModel.findOne({
-          where: { anonymousId: decodedId }
-        })
-        if (!cart) {
-          cart = await CartModel.create({ anonymousId: decodedId })
-        }
-        const item = await ProductModel.findByPk(itemID)
-        const products = await cart.addProduct(item, {
-          through: {
-            quantity: quantity,
-            colour: color,
-            size: size
-          }
-        })
-
-        const count = await cartProduct.sum('quantity', {
-          where: { cartId: cart.id }
-        })
-
-        return res.status(200).json({
-          msg: 'added succesfuly to cart',
-          total: count || 0
-        })
-      }
-
-      decoded = jwt.verify(anonymousToken, process.env.ACCESS_TOKEN_SECRET)
-      const decodedId = decoded.anonymousID
-      console.log(decodedId)
-
-      let cart = await CartModel.findOne({
-        where: { anonymousId: decodedId }
-      })
-      if (!cart) {
-        cart = await CartModel.create({ anonymousId: decodedId })
-      }
-      const item = await ProductModel.findByPk(itemID)
-      const products = await cart.addProduct(item, {
-        through: {
-          quantity: quantity,
-          colour: color,
-          size: size
-        }
-      })
-
-      const count = await cartProduct.sum('quantity', {
-        where: { cartId: cart.id }
-      })
-      return res.status(200).json({
-        msg: 'added succesfuly to cart',
-        total: count || 0
-      })
+    let cart = await CartModel.findOne({
+      where: { anonymousId: decodedId }
+    })
+    if (!cart) {
+      cart = await CartModel.create({ anonymousId: decodedId })
     }
+    const item = await ProductModel.findByPk(itemID)
+    await cart.addProduct(item, {
+      through: {
+        quantity: quantity,
+        colour: color,
+        size: size
+      }
+    })
+
+    const count = await cartProduct.sum('quantity', {
+      where: { cartId: cart.id }
+    })
+    return res.status(200).json({
+      msg: 'added succesfuly to cart',
+      total: count || 0
+    })
   } catch (error) {
     console.log('save to cart error', error.message)
     res.status(500).json({

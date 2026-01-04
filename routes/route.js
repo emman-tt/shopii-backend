@@ -11,11 +11,11 @@ import {
   fetchCart,
   UpdateCart
 } from '../controller/cart.js'
-import { Authenticator } from '../middleware/auth.js'
+import { Authenticator, EnsureAnonymous } from '../middleware/auth.js'
 router.get('/getSPP', GetSPP)
 router.post('/upload', upload.single('image'), Uploader)
 router.get('/AllProducts', GetAllProducts)
-router.post('/cart', SaveToCart)
+router.post('/cart', EnsureAnonymous, SaveToCart)
 router.get('/fetchCart', Authenticator, fetchCart)
 router.put('/fetchTotal', Authenticator, readTotal)
 router.delete('/RemoveCart', Authenticator, DeleteFromCart)
