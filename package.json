@@ -2,11 +2,13 @@
   "dependencies": {
     "cloudinary": "^1.41.3",
     "connect-session-sequelize": "^8.0.4",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "eslint": "^9.39.1",
     "express": "^5.1.0",
     "express-session": "^1.18.2",
+    "jsonwebtoken": "^9.0.3",
     "multer": "^2.0.2",
     "multer-storage-cloudinary": "^4.0.0",
     "mysql2": "^3.15.3",
@@ -15,7 +17,8 @@
     "pg-hstore": "^2.3.4",
     "postgres": "^3.4.7",
     "prettier": "^3.6.2",
-    "sequelize": "^6.37.7"
+    "sequelize": "^6.37.7",
+    "uuid": "^13.0.0"
   },
   "name": "shopii-backend",
   "version": "1.0.0",

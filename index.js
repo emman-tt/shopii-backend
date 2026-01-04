@@ -12,7 +12,9 @@ import { GenderModel } from './database/gender.js'
 import { CartModel } from './database/cart.js'
 import { cartProduct } from './database/cartProducts.js'
 import { UserModel } from './database/user.js'
+import { AnonymousModel } from './database/anonymous.js'
 import session from 'express-session'
+import cookieParser from 'cookie-parser'
 import connectSessionSequelize from 'connect-session-sequelize'
 const SequelizeStore = connectSessionSequelize(session.Store)
 
@@ -40,7 +42,7 @@ app.use(
 )
 
 sessionStore.sync()
-
+app.use(cookieParser());
 /** @type {import('sequelize').ModelStatic<import('sequelize').Model>} */
 
 app.use(

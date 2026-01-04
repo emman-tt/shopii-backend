@@ -11,13 +11,14 @@ import {
   fetchCart,
   UpdateCart
 } from '../controller/cart.js'
+import { Authenticator } from '../middleware/auth.js'
 router.get('/getSPP', GetSPP)
 router.post('/upload', upload.single('image'), Uploader)
 router.get('/AllProducts', GetAllProducts)
 router.post('/cart', SaveToCart)
-router.get('/fetchCart', fetchCart)
-router.put('/fetchTotal', readTotal)
-router.delete('/RemoveCart', DeleteFromCart)
-router.put('/UpdateCart', UpdateCart)
+router.get('/fetchCart', Authenticator, fetchCart)
+router.put('/fetchTotal', Authenticator, readTotal)
+router.delete('/RemoveCart', Authenticator, DeleteFromCart)
+router.put('/UpdateCart', Authenticator, UpdateCart)
 
 export default router
