@@ -18,48 +18,24 @@ import cookieParser from 'cookie-parser'
 import connectSessionSequelize from 'connect-session-sequelize'
 const SequelizeStore = connectSessionSequelize(session.Store)
 
-// const sessionStore = new SequelizeStore({
-//   db: sequelize,
-//   checkExpirationInterval: 1000 * 60,
-//   expiration: 1000 * 60 * 60 * 12 * 3
-// })
-
-// app.use(
-//   session({
-//     secret: process.env.SESSION_SECRET , 
-//     store: sessionStore,
-//     resave: false,
-//     saveUninitialized: false,
-//     proxy: true,
-//     cookie: {
-//       sameSite: 'none',
-//       path: '/',
-//       maxAge: 3 * 24 * 60 * 60 * 1000,
-//       httpOnly: true,
-//       secure: true
-//     }
-//   })
-// )
-
-// sessionStore.sync()
-app.use(cookieParser());
+app.use(cookieParser())
 /** @type {import('sequelize').ModelStatic<import('sequelize').Model>} */
 
 app.use(
   cors({
     origin: [
       'http://localhost:5173',
-      'https://emman-tt.github.io/shopii/',
+      'https://emman-tt.github.io/shopii',
       'https://shopii-web.vercel.app'
     ],
     credentials: true,
+    allowedHeaders: ['Content-Type'],
     methods: ['GET', 'POST', 'PUT', 'DELETE']
   })
 )
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-
 
 app.use('/api', routes)
 

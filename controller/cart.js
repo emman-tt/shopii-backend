@@ -117,6 +117,7 @@ export async function SaveToCart (req, res) {
           sameSite: 'none',
           maxAge: 7 * 24 * 60 * 60 * 1000
         })
+        res.header('Access-Control-Allow-Credentials', 'true')
 
         decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET)
         const decodedId = decoded.anonymousID
