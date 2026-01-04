@@ -18,30 +18,30 @@ import cookieParser from 'cookie-parser'
 import connectSessionSequelize from 'connect-session-sequelize'
 const SequelizeStore = connectSessionSequelize(session.Store)
 
-const sessionStore = new SequelizeStore({
-  db: sequelize,
-  checkExpirationInterval: 1000 * 60,
-  expiration: 1000 * 60 * 60 * 12 * 3
-})
+// const sessionStore = new SequelizeStore({
+//   db: sequelize,
+//   checkExpirationInterval: 1000 * 60,
+//   expiration: 1000 * 60 * 60 * 12 * 3
+// })
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET , 
-    store: sessionStore,
-    resave: false,
-    saveUninitialized: false,
-    proxy: true,
-    cookie: {
-      sameSite: 'none',
-      path: '/',
-      maxAge: 3 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-      secure: true
-    }
-  })
-)
+// app.use(
+//   session({
+//     secret: process.env.SESSION_SECRET , 
+//     store: sessionStore,
+//     resave: false,
+//     saveUninitialized: false,
+//     proxy: true,
+//     cookie: {
+//       sameSite: 'none',
+//       path: '/',
+//       maxAge: 3 * 24 * 60 * 60 * 1000,
+//       httpOnly: true,
+//       secure: true
+//     }
+//   })
+// )
 
-sessionStore.sync()
+// sessionStore.sync()
 app.use(cookieParser());
 /** @type {import('sequelize').ModelStatic<import('sequelize').Model>} */
 
@@ -60,10 +60,7 @@ app.use(
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-app.use('/', (req, res, next) => {
-  req.session.visited = true
-  next()
-})
+
 app.use('/api', routes)
 
 app.get('/', (req, res) => {

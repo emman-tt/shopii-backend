@@ -107,7 +107,7 @@ export async function SaveToCart (req, res) {
         res.cookie('anonymousToken', accessToken, {
           httpOnly: true,
           secure: false,
-          maxAge: 1000 * 60 * 25 
+          maxAge: 1000 * 60 * 25
         })
 
         res.cookie('refreshToken', refreshToken, {
@@ -119,9 +119,6 @@ export async function SaveToCart (req, res) {
         decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET)
         const decodedId = decoded.anonymousID
         console.log(decodedId)
-        const newAnonymousUser = await AnonymousModel.create({
-          data: decodedId
-        })
 
         let cart = await CartModel.findOne({
           where: { anonymousId: decodedId }

@@ -3,7 +3,7 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 import crypto from 'crypto'
-import { json } from 'sequelize'
+
 
 export function generateAnonymousTokens () {
   try {
