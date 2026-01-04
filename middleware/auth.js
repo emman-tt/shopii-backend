@@ -4,7 +4,6 @@ import dotenv from 'dotenv'
 dotenv.config()
 import crypto from 'crypto'
 
-
 export function generateAnonymousTokens () {
   try {
     const anonymousID = crypto.randomBytes(10).toString('hex')
@@ -39,13 +38,7 @@ export async function Authenticator (req, res, next) {
       return res.status(200).json({
         msg: 'user exists'
       })
-    
     }
-
-    // if (!anonymousToken) {
-    //   console.log('no token here anonymous')
-    //   next()
-    // }
 
     try {
       const decoded = jwt.verify(
@@ -71,7 +64,8 @@ export async function Authenticator (req, res, next) {
 
           res.cookie('anonymousToken', newAccessToken, {
             httpOnly: true,
-            secure: false,
+            secure: true,
+            sameSite: 'none',
             maxAge: 15 * 60 * 1000
           })
 

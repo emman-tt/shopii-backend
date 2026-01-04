@@ -106,13 +106,15 @@ export async function SaveToCart (req, res) {
 
         res.cookie('anonymousToken', accessToken, {
           httpOnly: true,
-          secure: false,
+          secure: true,
+          sameSite: 'none',
           maxAge: 1000 * 60 * 25
         })
 
         res.cookie('refreshToken', refreshToken, {
           httpOnly: true,
-          secure: false,
+          secure: true,
+          sameSite: 'none',
           maxAge: 7 * 24 * 60 * 60 * 1000
         })
 
