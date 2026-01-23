@@ -27,10 +27,11 @@ export async function UpdateCart (req, res) {
         msg: 'no access token'
       })
     }
-    const decoded = req.user.anonymousID
+    const anonymousUserCart = req.anonymousUserCart
+    // const decoded = req.user.anonymousID
 
     const cart = await CartModel.findOne({
-      where: { anonymousId: decoded }
+      where: { anonymousId: anonymousUserCart }
     })
 
     const item = await cart.getProducts({
@@ -70,9 +71,10 @@ export async function DeleteFromCart (req, res) {
         msg: 'no access token denied'
       })
     }
-    const decodedId = req.user.anonymousID
+    const anonymousUserCart = req.anonymousUserCart
+    // const decodedId = req.user.anonymousID
     const cart = await CartModel.findOne({
-      where: { anonymousId: decodedId }
+      where: { anonymousId: anonymousUserCart }
     })
     if (cart) {
       await cartProduct.destroy({
@@ -98,13 +100,14 @@ export async function SaveToCart (req, res) {
   try {
     const { itemID, quantity, color, size } = req.query
 
-    const decodedId = req.user.anonymousID
+    // const decodedId = req.user.anonymousID
+    const anonymousUserCart = req.anonymousUserCart
 
     let cart = await CartModel.findOne({
-      where: { anonymousId: decodedId }
+      where: { anonymousId: anonymousUserCart }
     })
     if (!cart) {
-      cart = await CartModel.create({ anonymousId: decodedId })
+      cart = await CartModel.create({ anonymousId: anonymousUserCart })
     }
     const item = await ProductModel.findByPk(itemID)
     await cart.addProduct(item, {
@@ -139,11 +142,11 @@ export async function readTotal (req, res) {
         total: 0
       })
     }
+    const anonymousUserCart = req.anonymousUserCart
 
-    const decodedId = req.user.anonymousID
 
     const cart = await CartModel.findOne({
-      where: { anonymousId: decodedId }
+      where: { anonymousId: anonymousUserCart }
     })
     const count = await cartProduct.sum('quantity', {
       where: { cartId: cart.id }
@@ -169,9 +172,10 @@ export async function fetchCart (req, res) {
       })
     }
 
-    const decodedId = req.user.anonymousID
+    const anonymousUserCart = req.anonymousUserCart
+    // const decodedId = req.user.anonymousID
     const cart = await CartModel.findOne({
-      where: { anonymousId: decodedId }
+      where: { anonymousId: anonymousUserCart }
     })
 
     const items = await cart.getProducts({
@@ -180,7 +184,6 @@ export async function fetchCart (req, res) {
 
     if (items) {
       const products = items.map(item => item.dataValues)
-
       return res.status(200).json({
         products: products
       })
