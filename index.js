@@ -16,6 +16,7 @@ import { AnonymousModel } from './database/anonymous.js'
 import session from 'express-session'
 import cookieParser from 'cookie-parser'
 import connectSessionSequelize from 'connect-session-sequelize'
+import { startKeepAlive } from './cron/cron.js'
 const SequelizeStore = connectSessionSequelize(session.Store)
 
 app.use(cookieParser())
@@ -85,6 +86,7 @@ ProductModel.belongsTo(GenderModel, {
   try {
     // await sequelize.sync({alter:true})
     await sequelize.sync()
+    startKeepAlive()
   } catch (error) {
     console.log('databse error', error.message)
   }

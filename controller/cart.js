@@ -144,7 +144,6 @@ export async function readTotal (req, res) {
     }
     const anonymousUserCart = req.anonymousUserCart
 
-
     const cart = await CartModel.findOne({
       where: { anonymousId: anonymousUserCart }
     })
