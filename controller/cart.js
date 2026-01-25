@@ -1,11 +1,8 @@
-// import { Sequelize, where } from 'sequelize'
 /** @type {import('sequelize').ModelStatic<import('sequelize').Model>} */
 import { ProductModel } from '../database/products.js'
 import { UserModel } from '../database/user.js'
 import { CartModel } from '../database/cart.js'
 import { cartProduct } from '../database/cartProducts.js'
-import { generateAnonymousTokens } from '../middleware/auth.js'
-import jwt from 'jsonwebtoken'
 import { AnonymousModel } from '../database/anonymous.js'
 export async function UpdateCart (req, res) {
   try {
@@ -20,15 +17,12 @@ export async function UpdateCart (req, res) {
       })
     }
 
-    let anonymousToken = req.cookies.anonymousToken || null
-
-    if (!anonymousToken) {
+    const anonymousUserCart = req.anonymousUserCart
+    if (!anonymousUserCart) {
       return res.status(401).json({
         msg: 'no access token'
       })
     }
-    const anonymousUserCart = req.anonymousUserCart
-    // const decoded = req.user.anonymousID
 
     const cart = await CartModel.findOne({
       where: { anonymousId: anonymousUserCart }
@@ -63,16 +57,13 @@ export async function UpdateCart (req, res) {
 export async function DeleteFromCart (req, res) {
   try {
     const { productID } = req.query
-
-    let anonymousToken = req.cookies.anonymousToken || null
-
-    if (!anonymousToken) {
+    const anonymousUserCart = req.anonymousUserCart
+    if (!anonymousUserCart) {
       return res.status(401).json({
-        msg: 'no access token denied'
+        msg: 'no cart available'
       })
     }
-    const anonymousUserCart = req.anonymousUserCart
-    // const decodedId = req.user.anonymousID
+
     const cart = await CartModel.findOne({
       where: { anonymousId: anonymousUserCart }
     })
@@ -100,7 +91,6 @@ export async function SaveToCart (req, res) {
   try {
     const { itemID, quantity, color, size } = req.query
 
-    // const decodedId = req.user.anonymousID
     const anonymousUserCart = req.anonymousUserCart
 
     let cart = await CartModel.findOne({
@@ -135,15 +125,13 @@ export async function SaveToCart (req, res) {
 
 export async function readTotal (req, res) {
   try {
-    let anonymousToken = req.cookies.anonymousToken || null
+    const anonymousUserCart = req.anonymousUserCart
 
-    if (!anonymousToken) {
+    if (!anonymousUserCart) {
       return res.status(200).json({
         total: 0
       })
     }
-    const anonymousUserCart = req.anonymousUserCart
-
     const cart = await CartModel.findOne({
       where: { anonymousId: anonymousUserCart }
     })
@@ -165,14 +153,19 @@ export async function fetchCart (req, res) {
   try {
     let anonymousToken = req.cookies.anonymousToken || null
 
-    if (!anonymousToken) {
+    // if (!anonymousToken) {
+
+    // }
+
+    const anonymousUserCart = req.anonymousUserCart
+    console.log(anonymousUserCart)
+
+    if (!anonymousUserCart) {
       return res.status(200).json({
         products: []
       })
     }
 
-    const anonymousUserCart = req.anonymousUserCart
-    // const decodedId = req.user.anonymousID
     const cart = await CartModel.findOne({
       where: { anonymousId: anonymousUserCart }
     })

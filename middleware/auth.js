@@ -3,7 +3,6 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 import crypto from 'crypto'
-import { error } from 'console'
 
 export function generateAnonymousTokens () {
   try {
@@ -36,7 +35,6 @@ export async function EnsureAnonymous (req, res, next) {
     const anonymousToken = req.cookies.anonymousToken
     const refreshTokenData = req.cookies.refreshToken
     const anonymousCartId = req.cookies.anonymousCartId
-    let decoded
 
     if (userId) {
       return res.status(200).json({
@@ -55,6 +53,40 @@ export async function EnsureAnonymous (req, res, next) {
         return next()
       } catch (error) {
         console.log(error.message)
+
+        // If token expired, try to refresh
+        if (error.name === 'TokenExpiredError' && refreshTokenData) {
+          try {
+            const decoded = jwt.verify(
+              refreshTokenData,
+              process.env.REFRESH_TOKEN_SECRET
+            )
+
+            const newAccessToken = jwt.sign(
+              { anonymousID: decoded.anonymousID },
+              process.env.ACCESS_TOKEN_SECRET,
+              { expiresIn: '15m' }
+            )
+
+            res.cookie('anonymousToken', newAccessToken, {
+              httpOnly: true,
+              secure: true,
+              sameSite: 'none',
+              maxAge: 1000 * 60 * 15
+            })
+
+            req.user = decoded
+            req.anonymousUserCart = anonymousCartId
+            return next()
+          } catch (refreshErr) {
+            res.clearCookie('anonymousToken')
+            res.clearCookie('refreshToken')
+            return res.status(401).json({
+              error: 'Session expired, please login again'
+            })
+          }
+        }
+
         return res.status(401).json({
           msg: 'invalid token'
         })
@@ -64,27 +96,31 @@ export async function EnsureAnonymous (req, res, next) {
     const { accessToken, refreshToken, randomNumber } =
       generateAnonymousTokens()
 
-    console.log(randomNumber)
-    decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET)
+    const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET)
+
     res.cookie('anonymousToken', accessToken, {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
-      maxAge: 1000 * 60 * 25
+      maxAge: 1000 * 60 * 15
     })
 
-    res.cookie('anonymousCartId', randomNumber, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    })
+    if (!anonymousCartId) {
+      res.cookie('anonymousCartId', randomNumber, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 7 * 24 * 60 * 60 * 1000
+      })
+    }
+
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000
     })
+
     res.header('Access-Control-Allow-Credentials', 'true')
     req.user = decoded
     req.anonymousUserCart = randomNumber
@@ -96,17 +132,54 @@ export async function EnsureAnonymous (req, res, next) {
     })
   }
 }
+
 export async function Authenticator (req, res, next) {
   try {
     const userId = req.cookies.userToken || null
     const anonymousToken = req.cookies.anonymousToken
     const refreshToken = req.cookies.refreshToken
     const anonymousCartId = req.cookies.anonymousCartId
+
     if (userId) {
       console.log('user already exists')
       return res.status(200).json({
         msg: 'user exists'
       })
+    }
+
+
+    if (!anonymousToken && anonymousCartId && refreshToken) {
+      req.anonymousUserCart = anonymousCartId
+      try {
+        const decoded = jwt.verify(
+          refreshToken,
+          process.env.REFRESH_TOKEN_SECRET
+        )
+
+        const newAccessToken = jwt.sign(
+          { anonymousID: decoded.anonymousID },
+          process.env.ACCESS_TOKEN_SECRET,
+          { expiresIn: '15m' }
+        )
+
+        res.cookie('anonymousToken', newAccessToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'none',
+          maxAge: 15 * 60 * 1000
+        })
+
+        req.user = decoded
+        req.anonymousUserCart = anonymousCartId
+        return next()
+      } catch (refreshErr) {
+        res.clearCookie('anonymousToken')
+        res.clearCookie('refreshToken')
+        res.clearCookie('anonymousCartId')
+        return res.status(401).json({
+          error: 'Session expired, please login again'
+        })
+      }
     }
 
     if (!anonymousToken) {
@@ -123,9 +196,10 @@ export async function Authenticator (req, res, next) {
         )
         req.user = decoded
         req.anonymousUserCart = anonymousCartId
-        next()
+        return next()
       } catch (error) {
         console.log(error.message)
+
         if (error.name === 'TokenExpiredError' && refreshToken) {
           console.log('token expired renewing it')
           try {
@@ -149,17 +223,18 @@ export async function Authenticator (req, res, next) {
 
             req.user = decoded
             req.anonymousUserCart = anonymousCartId
-
-            next()
+            return next()
           } catch (refreshErr) {
+            res.clearCookie('anonymousToken')
+            res.clearCookie('refreshToken')
+            res.clearCookie('anonymousCartId')
             return res.status(401).json({
               error: 'Session expired, please login again'
             })
           }
-        } else {
-          res.clearCookie('anonymousToken')
-          return res.status(401).json({ error: 'Invalid token' })
         }
+
+        return res.status(401).json({ error: 'Invalid token' })
       }
     }
   } catch (error) {

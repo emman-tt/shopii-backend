@@ -6,7 +6,6 @@ export function startKeepAlive () {
     try {
       console.log('[CRON] Keep-alive ping at', new Date().toISOString())
 
-      // Simple query to keep database connection active
       await sequelize.query('SELECT 1')
 
       console.log('[CRON] Backend & Database active ')
